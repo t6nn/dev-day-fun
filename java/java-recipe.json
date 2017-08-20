@@ -1,0 +1,58 @@
+{
+  "source": {
+    "origin": "eclipse/ubuntu_jdk8",
+    "type": "image"
+  },
+  "description": "Plain Java",
+  "scope": "general",
+  "tags": [
+    "Java",
+    "JDK",
+    "Ubuntu"
+  ],
+  "creator": "che",
+  "workspaceConfig": {
+    "environments": {
+      "default": {
+        "recipe": {
+          "location": "eclipse/ubuntu_jdk8",
+          "type": "dockerimage"
+        },
+        "machines": {
+          "dev-machine": {
+            "agents": [
+              "org.eclipse.che.exec",
+              "org.eclipse.che.terminal",
+              "org.eclipse.che.ws-agent",
+              "org.eclipse.che.ssh"
+            ],
+            "servers": {},
+            "attributes": {
+              "memoryLimitBytes": "2147483648"
+            }
+          }
+        }
+      }
+    },
+    "commands": [
+      {
+        "name": "compile",
+        "type": "custom",
+        "commandLine": "javac Solution.java",
+        "attributes": {}
+      }
+    ],
+    "projects": [],
+    "defaultEnv": "default",
+    "name": "default",
+    "links": []
+  },
+  "components": [
+    {
+      "version": "1.8.0_45",
+      "name": "JDK"
+    }
+  ],
+  "name": "Plain Old Java",
+  "id": "stacksye61h00zuju9pik"
+}

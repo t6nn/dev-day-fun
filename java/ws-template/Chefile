@@ -1,0 +1,8 @@
+workspace.commands[0].type="custom"
+workspace.commands[0].name="Compile"
+workspace.commands[0].commandLine="javac Solution.java"
+workspace.projects[0].type="blank"
+#workspace.postload.actions[0].command="my-first-command"
+#workspace.postload.actions[1].script="echo 'this is my custom command' && while true; do echo $(date); sleep 1; done"
+workspace.name="Solution Workspace"
+workspace.ram=2048
