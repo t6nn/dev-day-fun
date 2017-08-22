@@ -67,7 +67,7 @@ public class GameSessions {
         }
     }
 
-    private File sessionDirectoryFor(String sessionId) {
+    public File sessionDirectoryFor(String sessionId) {
         return new File(sessionDir, sessionId);
     }
 
