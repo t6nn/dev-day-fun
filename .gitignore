@@ -1,1 +1,6 @@
 che-data
+
+.idea
+*.iws
+*.iml
+*.ipr
