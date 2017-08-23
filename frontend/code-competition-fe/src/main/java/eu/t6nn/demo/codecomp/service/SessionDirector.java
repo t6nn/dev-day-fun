@@ -1,8 +1,6 @@
 package eu.t6nn.demo.codecomp.service;
 
 import com.google.gson.Gson;
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
@@ -14,10 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.net.UnknownHostException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -39,6 +43,17 @@ public class SessionDirector {
     @Value("eclipse/che:${che.version}")
     private String cheImage;
 
+    @Value("${che.port.range.start}")
+    private int firstChePort;
+
+    @Value("${che.port.range.end}")
+    private int lastChePort;
+
+    @Value("${docker.socket:/var/run/docker.sock}")
+    private String dockerSocket;
+
+    private Set<Integer> portsInUse = new ConcurrentSkipListSet<>();
+
     public void direct(GameSession session, final Consumer<DirectedSession> sessionCallback) {
         final File sessionDir = sessions.sessionDirectoryFor(session.getId());
 
@@ -52,38 +67,57 @@ public class SessionDirector {
             try {
                 docker.pull(cheImage);
 
-                final Map<String, List<PortBinding>> portBindings = new HashMap<>();
-                List<PortBinding> hostChePort = Collections.singletonList(PortBinding.randomPort("0.0.0.0"));
-                portBindings.put("8080", hostChePort);
+                final int chePort = allocateChePort();
 
-                final HostConfig hostConfig = HostConfig.builder()
-                        .appendBinds(HostConfig.Bind.from(cheDataDir(sessionDir).getAbsolutePath()).to("/data").build())
-                        .appendBinds(HostConfig.Bind.from(cheWorkspaceDir(sessionDir).getAbsolutePath()).to("/chedir").build())
-                        .portBindings(portBindings).build();
-
-                final ContainerConfig containerConfig = ContainerConfig.builder()
-                        .hostConfig(hostConfig)
-                        .image(cheImage)
-                        .exposedPorts("8080")
-                        //.cmd("sh", "-c", "while :; do sleep 1; done")
-                        .build();
+                final ContainerConfig containerConfig = createContainerConfig(sessionDir, chePort, "dir", "up");
 
                 final ContainerCreation creation = docker.createContainer(containerConfig);
                 final String id = creation.id();
 
                 docker.startContainer(id);
-                PortBinding chePortBinding = docker.inspectContainer(id).networkSettings().ports().get("8080").get(0);
 
-                DockerSession dockerSession = new DockerSession(id, chePortBinding);
+                for(Container container: docker.listContainers(DockerClient.ListContainersParam.containersCreatedSince(id))) {
+                    System.out.println(container);
+                }
+
+                //PortBinding chePortBinding = docker.inspectContainer(id).networkSettings().ports().get("8080").get(0);
+
+                DockerSession dockerSession = new DockerSession(id, chePort);
                 storeSession(sessionDir, dockerSession);
                 sessionCallback.accept(dockerSession);
 
+                //docker.stopContainer(id, 60);
+                //docker.removeContainer(id);
             } catch (InterruptedException e) {
                 throw new IllegalStateException("Interrupted while setting up docker.");
             } catch (DockerException e) {
                 throw new IllegalStateException("Unable to set up docker.", e);
             }
         });
+    }
+
+    private ContainerConfig createContainerConfig(File sessionDir, int chePort, String ... cmd) {
+        final HostConfig hostConfig = HostConfig.builder()
+                .appendBinds(HostConfig.Bind.from(cheDataDir(sessionDir).getAbsolutePath()).to("/data").build())
+                .appendBinds(HostConfig.Bind.from(cheWorkspaceDir(sessionDir).getAbsolutePath()).to("/chedir").build())
+                .appendBinds(HostConfig.Bind.from(dockerSocket).to("/var/run/docker.sock").build())
+                .build();
+
+        return ContainerConfig.builder()
+                .hostConfig(hostConfig)
+                .image(cheImage)
+                .env("CHE_PORT=" + chePort)
+                .cmd(cmd)
+                .build();
+    }
+
+    private int allocateChePort() {
+        for(int port = firstChePort; port <= lastChePort; port++) {
+            if(portsInUse.add(port)) {
+                return port;
+            }
+        }
+        throw new IllegalStateException("Could not allocate a port for che");
     }
 
     private void storeSession(File sessionDir, DockerSession dockerSession) {
@@ -106,11 +140,29 @@ public class SessionDirector {
 
     public void stop(GameSession gameSession) {
         final File sessionDir = sessions.sessionDirectoryFor(gameSession.getId());
-        DockerSession session = loadSession(sessionDir);
-        stop(session);
+        final DockerSession session = loadSession(sessionDir);
+
+        executorService.submit(() -> {
+            try {
+                //docker.stopContainer(dockerSession.containerId, 30);
+                //docker.removeContainer(dockerSession.containerId);
+                ContainerConfig config = createContainerConfig(sessionDir, session.cheBinding, "dir", "down");
+                final ContainerCreation creation = docker.createContainer(config);
+                final String id = creation.id();
+
+                docker.startContainer(id);
+                //docker.stopContainer(id, 60);
+                //docker.removeContainer(id);
+            } catch (DockerException e) {
+                throw new IllegalStateException("Unable to stop docker.", e);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException("Interrupted while waiting for docker to stop.");
+            }
+        });
+        //stop(session);
     }
 
-    public void stop(DirectedSession session) {
+    private void stop(DirectedSession session) {
         if (!(session instanceof DockerSession)) {
             throw new IllegalArgumentException("Unidentified session");
         }
@@ -118,6 +170,7 @@ public class SessionDirector {
 
         executorService.submit(() -> {
             try {
+
                 docker.stopContainer(dockerSession.containerId, 30);
                 docker.removeContainer(dockerSession.containerId);
             } catch (DockerException e) {
@@ -154,9 +207,9 @@ public class SessionDirector {
 
     private static final class DockerSession implements DirectedSession {
         private final String containerId;
-        private final PortBinding cheBinding;
+        private final int cheBinding;
 
-        private DockerSession(String containerId, PortBinding cheBinding) {
+        private DockerSession(String containerId, int cheBinding) {
             this.containerId = containerId;
             this.cheBinding = cheBinding;
         }
@@ -164,8 +217,8 @@ public class SessionDirector {
         @Override
         public URL workspaceUrl() {
             try {
-                return new URL("http://" + cheBinding.hostIp() + ":" + cheBinding.hostPort());
-            } catch (MalformedURLException e) {
+                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding);
+            } catch (UnknownHostException | MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
         }

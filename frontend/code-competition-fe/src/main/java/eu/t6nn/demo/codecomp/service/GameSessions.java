@@ -12,7 +12,7 @@ import java.io.*;
 @Component
 public class GameSessions {
 
-    @Value("${session.directory}")
+    @Value("#{'${session.directory}' ?: systemProperties['java.io.tmpdir']}")
     private File sessionDir;
 
     @PostConstruct
