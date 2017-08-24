@@ -84,14 +84,9 @@ public class SessionDirector {
                     System.out.println(container);
                 }
 
-                //PortBinding chePortBinding = docker.inspectContainer(id).networkSettings().ports().get("8080").get(0);
-
                 DockerSession dockerSession = new DockerSession(id, chePort);
                 storeSession(sessionDir, dockerSession);
                 sessionCallback.accept(dockerSession);
-
-                //docker.stopContainer(id, 60);
-                //docker.removeContainer(id);
             } catch (InterruptedException e) {
                 throw new IllegalStateException("Interrupted while setting up docker.");
             } catch (DockerException e) {
@@ -149,22 +144,17 @@ public class SessionDirector {
 
         executorService.submit(() -> {
             try {
-                //docker.stopContainer(dockerSession.containerId, 30);
-                //docker.removeContainer(dockerSession.containerId);
                 ContainerConfig config = createContainerConfig(sessionDir, session.cheBinding, "dir", "down");
                 final ContainerCreation creation = docker.createContainer(config);
                 final String id = creation.id();
 
                 docker.startContainer(id);
-                //docker.stopContainer(id, 60);
-                //docker.removeContainer(id);
             } catch (DockerException e) {
                 throw new IllegalStateException("Unable to stop docker.", e);
             } catch (InterruptedException e) {
                 throw new IllegalStateException("Interrupted while waiting for docker to stop.");
             }
         });
-        //stop(session);
     }
 
     private void stop(DirectedSession session) {
