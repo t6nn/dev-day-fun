@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -54,6 +55,11 @@ public class SessionDirector {
 
     private Set<Integer> portsInUse = new ConcurrentSkipListSet<>();
 
+    @PostConstruct
+    public void setupDirector() throws DockerException, InterruptedException {
+        docker.pull(cheImage);
+    }
+
     public void direct(GameSession session, final Consumer<DirectedSession> sessionCallback) {
         final File sessionDir = sessions.sessionDirectoryFor(session.getId());
 
@@ -65,8 +71,6 @@ public class SessionDirector {
 
         executorService.submit(() -> {
             try {
-                docker.pull(cheImage);
-
                 final int chePort = allocateChePort();
 
                 final ContainerConfig containerConfig = createContainerConfig(sessionDir, chePort, "dir", "up");
@@ -98,6 +102,7 @@ public class SessionDirector {
 
     private ContainerConfig createContainerConfig(File sessionDir, int chePort, String ... cmd) {
         final HostConfig hostConfig = HostConfig.builder()
+                .autoRemove(true)
                 .appendBinds(HostConfig.Bind.from(cheDataDir(sessionDir).getAbsolutePath()).to("/data").build())
                 .appendBinds(HostConfig.Bind.from(cheWorkspaceDir(sessionDir).getAbsolutePath()).to("/chedir").build())
                 .appendBinds(HostConfig.Bind.from(dockerSocket).to("/var/run/docker.sock").build())
@@ -217,7 +222,7 @@ public class SessionDirector {
         @Override
         public URL workspaceUrl() {
             try {
-                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding);
+                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding + "/dashboard/#/ide/che/solution");
             } catch (UnknownHostException | MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
