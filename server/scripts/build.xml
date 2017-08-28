@@ -1,0 +1,14 @@
+<project name="Build All" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+
+    <property name="sessions" location="/work/sessions"/>
+    <property name="build" location="${TARGET}"/>
+
+    <target name="compile" description="compile the source">
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac destdir="${build}" listfiles="Solution.java"/>
+    </target>
+
+</project>

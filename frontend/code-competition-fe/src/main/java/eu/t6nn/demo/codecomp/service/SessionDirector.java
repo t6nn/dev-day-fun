@@ -157,25 +157,6 @@ public class SessionDirector {
         });
     }
 
-    private void stop(DirectedSession session) {
-        if (!(session instanceof DockerSession)) {
-            throw new IllegalArgumentException("Unidentified session");
-        }
-        final DockerSession dockerSession = (DockerSession) session;
-
-        executorService.submit(() -> {
-            try {
-
-                docker.stopContainer(dockerSession.containerId, 30);
-                docker.removeContainer(dockerSession.containerId);
-            } catch (DockerException e) {
-                throw new IllegalStateException("Unable to stop docker.", e);
-            } catch (InterruptedException e) {
-                throw new IllegalStateException("Interrupted while waiting for docker to stop.");
-            }
-        });
-    }
-
     private void setupWorkspace(File sessionDir, Language lang) throws IOException {
         File languageDir = new File(languageSetups, lang.name().toLowerCase());
         if (!languageDir.isDirectory()) {
