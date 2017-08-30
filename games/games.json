@@ -1,0 +1,7 @@
+{
+  "code-golf-1": {
+    "enabled": true,
+    "name": "Reverse an integer",
+    "rules": "CODEGOLF"
+  }
+}

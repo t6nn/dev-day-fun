@@ -1,6 +1,7 @@
 package eu.t6nn.demo.codecomp.service;
 
 import com.google.gson.Gson;
+import eu.t6nn.demo.codecomp.model.GameListItem;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Player;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ public class GameSessions {
         }
     }
 
-    public GameSession register(Player player) {
+    public GameSession register(Player player, String gameToPlay) {
         GameSession session = new GameSession(player);
         File sessionDir = sessionDirectoryFor(session.getId());
         createSessionDirectory(sessionDir);
