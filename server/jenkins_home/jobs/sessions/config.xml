@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <org.jenkinsci.plugins.fstrigger.triggers.FileNameTrigger plugin="fstrigger@0.39">
+      <spec>* * * * *</spec>
+      <fileInfo>
+        <org.jenkinsci.plugins.fstrigger.triggers.FileNameTriggerInfo>
+          <filePathPattern>/work/sessions/**/che-workspace/Solution.java</filePathPattern>
+          <strategy>LATEST</strategy>
+          <inspectingContentFile>false</inspectingContentFile>
+          <doNotCheckLastModificationDate>false</doNotCheckLastModificationDate>
+          <contentFileTypes/>
+        </org.jenkinsci.plugins.fstrigger.triggers.FileNameTriggerInfo>
+      </fileInfo>
+    </org.jenkinsci.plugins.fstrigger.triggers.FileNameTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>cd /work/scripts
+./build_all.sh /work/sessions</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.tasks.AntWrapper plugin="ant@1.7">
+      <installation>ant-main</installation>
+    </hudson.tasks.AntWrapper>
+  </buildWrappers>
+</project>

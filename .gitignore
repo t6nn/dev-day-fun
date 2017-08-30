@@ -1,5 +1,8 @@
 che-data
 
+server/jenkins_home/*
+!server/jenkins_home/jobs/sessions/config.xml
+
 .idea
 *.iws
 *.iml

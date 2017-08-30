@@ -10,6 +10,8 @@ services:
     
     volumes:
       - /tmp/codecomp-sessions:/work/sessions
+      - ./scripts:/work/scripts
+      - ./jenkins_home:/var/jenkins_home
 
     secrets:
       - jenkins-user

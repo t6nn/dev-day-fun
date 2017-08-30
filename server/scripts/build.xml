@@ -1,14 +1,20 @@
-<project name="Build All" default="dist" basedir=".">
+<project name="Build All" default="compile-and-test" basedir=".">
     <description>
         simple example build file
     </description>
 
-    <property name="sessions" location="/work/sessions"/>
-    <property name="build" location="${TARGET}"/>
+    <property name="projectdir" value="/dev/null"/>
+    <property name="build" location="${projectdir}/out"/>
 
     <target name="compile" description="compile the source">
-        <!-- Compile the java code from ${src} into ${build} -->
-        <javac destdir="${build}" listfiles="Solution.java"/>
+        <mkdir dir="${build}"/>
+        <javac srcdir="${projectdir}" destdir="${build}" includeantruntime="false">
+            <!--include name="Solution.java"/-->
+        </javac>
+    </target>
+
+    <target name="compile-and-test" depends="compile">
+
     </target>
 
 </project>
