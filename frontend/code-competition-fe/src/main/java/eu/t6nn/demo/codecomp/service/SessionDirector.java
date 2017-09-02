@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 @Component
 public class SessionDirector {
 
+    public static final String CHE_SESSION_FILENAME = "che-session.json";
     @Autowired
     private GameSessions sessions;
 
@@ -37,6 +38,9 @@ public class SessionDirector {
 
     @Autowired
     private DockerClient docker;
+
+    @Autowired
+    private GameTemplates templates;
 
     @Value("${lang.setup.directory}")
     private File languageSetups;
@@ -64,7 +68,8 @@ public class SessionDirector {
         final File sessionDir = sessions.sessionDirectoryFor(session.getId());
 
         try {
-            setupWorkspace(sessionDir, session.getPlayer().getLang());
+            File workspaceDir = setupWorkspace(sessionDir, session.getPlayer().getLang());
+            templates.prepareSession(session.getGameId(), sessionDir, workspaceDir);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to set up workspace.", e);
         }
@@ -122,7 +127,7 @@ public class SessionDirector {
 
     private void storeSession(File sessionDir, DockerSession dockerSession) {
         Gson gson = new Gson();
-        try (FileWriter writer = new FileWriter(new File(sessionDir, "session.json"))) {
+        try (FileWriter writer = new FileWriter(new File(sessionDir, CHE_SESSION_FILENAME))) {
             gson.toJson(dockerSession, writer);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to store game session");
@@ -131,10 +136,10 @@ public class SessionDirector {
 
     private DockerSession loadSession(File sessionDir) {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(new File(sessionDir, "session.json"))){
+        try (FileReader reader = new FileReader(new File(sessionDir, CHE_SESSION_FILENAME))){
             return gson.fromJson(reader, DockerSession.class);
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to load game session");
+            throw new IllegalStateException("Unable to load game session", e);
         }
     }
 
@@ -157,19 +162,20 @@ public class SessionDirector {
         });
     }
 
-    private void setupWorkspace(File sessionDir, Language lang) throws IOException {
+    private File setupWorkspace(File sessionDir, Language lang) throws IOException {
         File languageDir = new File(languageSetups, lang.name().toLowerCase());
         if (!languageDir.isDirectory()) {
             throw new IllegalStateException("Directory " + languageDir + " does not exist");
         }
         File templateDir = new File(languageDir, "ws-template");
-        File templateTarget = cheWorkspaceDir(sessionDir);
+        File workspaceDir = cheWorkspaceDir(sessionDir);
 
         File cheData = cheDataDir(sessionDir);
         if (!cheData.isDirectory() && !cheData.mkdirs()) {
             throw new IllegalStateException("Unable to create Che working directory");
         }
-        FileUtils.copyDirectory(templateDir, templateTarget);
+        FileUtils.copyDirectory(templateDir, workspaceDir);
+        return workspaceDir;
     }
 
     private File cheWorkspaceDir(File sessionDir) {

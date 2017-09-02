@@ -36,5 +36,12 @@ public class GameList {
         return defs.entrySet().stream().map(e -> new GameListItem(e.getKey(), e.getValue())).collect(Collectors.toList());
     }
 
+    public GameDef byId(String gameId) {
+        GameDef def = defs.get(gameId);
+        if(def == null) {
+            throw new IllegalArgumentException("Game ID " + gameId + " is unknown.");
+        }
+        return def;
+    }
 
 }

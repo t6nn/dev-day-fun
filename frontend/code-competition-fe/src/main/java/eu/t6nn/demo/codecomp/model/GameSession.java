@@ -4,34 +4,47 @@ import java.util.UUID;
 
 public class GameSession {
 
-    private final String id;
+    private String id;
 
     private Player player;
 
+    private String gameId;
+
     public GameSession() {
-        id = UUID.randomUUID().toString();
+        this(null, null);
     }
 
-    public GameSession(String id, Player player) {
+    private GameSession(String id, Player player, String gameId) {
         this.id = id;
         this.player = player;
+        this.gameId = gameId;
     }
 
-    public GameSession(Player player) {
-        this();
-        this.player = player;
+    public GameSession(Player player, String gameId) {
+        this(UUID.randomUUID().toString(), player, gameId);
     }
 
     public String getId() {
         return id;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Player getPlayer() {
         return player;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
 }

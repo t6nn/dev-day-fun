@@ -3,6 +3,7 @@ package eu.t6nn.demo.codecomp.controller;
 import eu.t6nn.demo.codecomp.model.GameListItem;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Player;
+import eu.t6nn.demo.codecomp.model.PlayerRegistration;
 import eu.t6nn.demo.codecomp.service.GameList;
 import eu.t6nn.demo.codecomp.service.GameSessions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,25 +32,25 @@ public class RegisterController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        if(!model.containsAttribute("player")) {
-            model.addAttribute("player", new Player());
-        }
-
         List<GameListItem> allGames = gameList.allGames();
-
         model.addAttribute("allGames", allGames);
-        model.addAttribute("selectedGame", allGames.get(0));
+
+        if(!model.containsAttribute("playerRegistration")) {
+            PlayerRegistration registration = new PlayerRegistration();
+            registration.setGameId(allGames.get(0).getId());
+            model.addAttribute("playerRegistration", registration);
+        }
 
         return "registrationForm";
     }
 
     @PostMapping("/register")
-    public ModelAndView registerUser(@Valid @ModelAttribute Player player, @ModelAttribute String selectedGame, BindingResult bindingResult) {
+    public ModelAndView registerUser(@Valid @ModelAttribute PlayerRegistration playerRegistration, BindingResult bindingResult) {
         if(!bindingResult.hasErrors()) {
-            GameSession session = sessions.register(player, selectedGame);
+            GameSession session = sessions.register(playerRegistration.getPlayer(), playerRegistration.getGameId());
             return new ModelAndView("redirect:/play/" + session.getId());
         } else {
-            return new ModelAndView("registrationForm", "player", player);
+            return new ModelAndView("registrationForm", "playerRegistration", playerRegistration);
         }
     }
 

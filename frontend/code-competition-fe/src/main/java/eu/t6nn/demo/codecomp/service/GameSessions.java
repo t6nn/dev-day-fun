@@ -1,20 +1,26 @@
 package eu.t6nn.demo.codecomp.service;
 
 import com.google.gson.Gson;
-import eu.t6nn.demo.codecomp.model.GameListItem;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Player;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 @Component
 public class GameSessions {
 
+    public static final String GAMESESSION_FILENAME = "game-session.json";
     @Value("#{'${session.directory}' ?: systemProperties['java.io.tmpdir']}")
     private File sessionDir;
+
+    @Value("${game.templates.dir}")
+    private File gameTemplates;
 
     @PostConstruct
     public void prepareDir() {
@@ -28,22 +34,22 @@ public class GameSessions {
     }
 
     public GameSession register(Player player, String gameToPlay) {
-        GameSession session = new GameSession(player);
+        GameSession session = new GameSession(player, gameToPlay);
         File sessionDir = sessionDirectoryFor(session.getId());
         createSessionDirectory(sessionDir);
-        savePlayerRegistration(player, sessionDir);
+        saveSession(session, sessionDir);
+
         return session;
     }
 
     public GameSession byId(String sessionId) {
         File dir = sessionDirectoryFor(sessionId);
         if(dir.isDirectory()) {
-            File playerReg = new File(dir, "player.json");
-            if(playerReg.isFile()) {
+            File sessionReg = new File(dir, GAMESESSION_FILENAME);
+            if(sessionReg.isFile()) {
                 Gson gson = new Gson();
-                try (FileReader reader = new FileReader(playerReg)){
-                    Player player = gson.fromJson(reader, Player.class);
-                    return new GameSession(sessionId, player);
+                try (FileReader reader = new FileReader(sessionReg)){
+                    return gson.fromJson(reader, GameSession.class);
                 } catch (IOException e) {
                     throw new IllegalStateException("Unable to read player information");
                 }
@@ -58,11 +64,11 @@ public class GameSessions {
         }
     }
 
-    private void savePlayerRegistration(Player player, File sessionDir) {
-        File playerReg = new File(sessionDir, "player.json");
+    private void saveSession(GameSession session, File sessionDir) {
+        File sessionReg = new File(sessionDir, GAMESESSION_FILENAME);
         Gson gson = new Gson();
-        try(FileWriter writer = new FileWriter(playerReg)) {
-            gson.toJson(player, writer);
+        try(FileWriter writer = new FileWriter(sessionReg)) {
+            gson.toJson(session, writer);
         } catch (IOException e) {
             throw new IllegalStateException("Could not persist player information");
         }

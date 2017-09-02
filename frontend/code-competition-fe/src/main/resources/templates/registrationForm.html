@@ -30,25 +30,25 @@
 
     <div class="starter-template">
         <h1>Register to Play</h1>
-        <form action="#" th:action="@{/register}" th:object="${player}" method="post">
+        <form action="#" th:action="@{/register}" th:object="${playerRegistration}" method="post">
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" th:field="*{name}"/>
-                <span class="alert alert-warning" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"/>
+                <input type="text" id="name" name="name" th:field="*{player.name}"/>
+                <span class="alert alert-warning" th:if="${#fields.hasErrors('player.name')}" th:errors="*{player.name}"/>
             </div>
             <div class="form-group">
                 <label for="email">E-mail:</label>
-                <input type="email" id="email" name="email" th:field="*{email}"/>
+                <input type="email" id="email" name="email" th:field="*{player.email}"/>
             </div>
             <div class="form-group">
                 <label for="lang">Lang:</label>
-                <select id="lang" name="lang" th:field="*{lang}">
+                <select id="lang" name="lang" th:field="*{player.lang}">
                     <option value="JAVA">Java</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="game">Game:</label>
-                <select id="game" name="game" th:field="${selectedGame}">
+                <select id="game" name="game" th:field="*{gameId}" th:value="*{gameId}">
                     <option th:each="game : ${allGames}" th:value="${game.id}" th:text="${game.gameDef.name}"></option>
                 </select>
             </div>
