@@ -18,6 +18,8 @@
         <h1>Play</h1>
         <span th:inline="text">Hi, [[${gs.player.name}]]. You'll be coding in no time. Please wait.</span>
 
+        <div><a th:href="@{${workspaceUrl}}" target="_blank">Click here to open the workspace.</a></div>
+
         <a th:href="@{/finish/{id}(id=${gs.id})}">Finish.</a>
     </div>
 

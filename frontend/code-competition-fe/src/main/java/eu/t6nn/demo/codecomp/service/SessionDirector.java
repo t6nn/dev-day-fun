@@ -67,6 +67,12 @@ public class SessionDirector {
     public void direct(GameSession session, final Consumer<DirectedSession> sessionCallback) {
         final File sessionDir = sessions.sessionDirectoryFor(session.getId());
 
+        if(isSessionRunning(sessionDir)) {
+            DockerSession runningSession = loadSession(sessionDir);
+            sessionCallback.accept(runningSession);
+            return;
+        }
+
         try {
             File workspaceDir = setupWorkspace(sessionDir, session.getPlayer().getLang());
             templates.prepareSession(session.getGameId(), sessionDir, workspaceDir);
@@ -132,6 +138,10 @@ public class SessionDirector {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to store game session");
         }
+    }
+
+    private boolean isSessionRunning(File sessionDir) {
+        return new File(sessionDir, CHE_SESSION_FILENAME).isFile();
     }
 
     private DockerSession loadSession(File sessionDir) {
