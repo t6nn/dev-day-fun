@@ -1,5 +1,6 @@
 package eu.t6nn.demo.codecomp.controller;
 
+import eu.t6nn.demo.codecomp.model.DirectedSession;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.service.GameSessions;
 import eu.t6nn.demo.codecomp.service.SessionDirector;
@@ -29,16 +30,19 @@ public class PlayController {
         GameSession session = sessions.byId(sessionId);
         model.addAttribute("gs", session);
 
-        final CompletableFuture<URL> workspaceUrl = new CompletableFuture<>();
+        final CompletableFuture<DirectedSession> runningSession = new CompletableFuture<>();
         director.direct(session, sess -> {
             System.out.println(sess.workspaceUrl());
-            workspaceUrl.complete(sess.workspaceUrl());
+            runningSession.complete(sess);
         });
 
         try {
-            model.addAttribute("workspaceUrl", workspaceUrl.get(5000, TimeUnit.SECONDS));
+            DirectedSession sess = runningSession.get(5000, TimeUnit.SECONDS);
+            model.addAttribute("workspaceUrl", sess.workspaceUrl());
+            model.addAttribute("apiUrl", sess.apiUrl());
         } catch (TimeoutException e) {
-            model.addAttribute("workspaceUrl", "#");
+            model.addAttribute("workspaceUrl", "");
+            model.addAttribute("apiUrl", "");
         }
 
         return "play";

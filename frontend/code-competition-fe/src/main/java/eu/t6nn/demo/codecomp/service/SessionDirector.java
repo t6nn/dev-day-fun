@@ -214,6 +214,15 @@ public class SessionDirector {
                 throw new IllegalStateException(e);
             }
         }
+
+        @Override
+        public URL apiUrl() {
+            try {
+                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding + "/api");
+            } catch (UnknownHostException | MalformedURLException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
 }

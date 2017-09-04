@@ -4,4 +4,5 @@ import java.net.URL;
 
 public interface DirectedSession {
     URL workspaceUrl();
+    URL apiUrl();
 }
