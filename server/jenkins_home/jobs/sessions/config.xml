@@ -10,18 +10,14 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <org.jenkinsci.plugins.fstrigger.triggers.FileNameTrigger plugin="fstrigger@0.39">
+    <org.jenkinsci.plugins.fstrigger.triggers.FolderContentTrigger plugin="fstrigger@0.39">
       <spec>* * * * *</spec>
-      <fileInfo>
-        <org.jenkinsci.plugins.fstrigger.triggers.FileNameTriggerInfo>
-          <filePathPattern>/work/sessions/**/che-workspace/Solution.java</filePathPattern>
-          <strategy>LATEST</strategy>
-          <inspectingContentFile>false</inspectingContentFile>
-          <doNotCheckLastModificationDate>false</doNotCheckLastModificationDate>
-          <contentFileTypes/>
-        </org.jenkinsci.plugins.fstrigger.triggers.FileNameTriggerInfo>
-      </fileInfo>
-    </org.jenkinsci.plugins.fstrigger.triggers.FileNameTrigger>
+      <path>/work/sessions/</path>
+      <includes>**/che-workspace/Solution.java</includes>
+      <excludeCheckLastModificationDate>false</excludeCheckLastModificationDate>
+      <excludeCheckContent>false</excludeCheckContent>
+      <excludeCheckFewerOrMoreFiles>false</excludeCheckFewerOrMoreFiles>
+    </org.jenkinsci.plugins.fstrigger.triggers.FolderContentTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>

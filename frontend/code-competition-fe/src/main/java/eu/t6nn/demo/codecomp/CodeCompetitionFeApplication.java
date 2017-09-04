@@ -4,11 +4,17 @@ import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,5 +38,24 @@ public class CodeCompetitionFeApplication {
         DefaultDockerClient docker = DefaultDockerClient.fromEnv().build();
         System.out.println(docker.listNodes());
         return docker;
+	}
+
+	@Bean("markdownOptions")
+	@Singleton
+	MutableDataSet markdownOptions() {
+		MutableDataSet options = new MutableDataSet();
+		return options;
+	}
+
+	@Bean
+	@Singleton
+	Parser markdownParser(MutableDataSet markdownOptions) {
+		return Parser.builder(markdownOptions).build();
+	}
+
+	@Bean
+	@Singleton
+	HtmlRenderer markdownRenderer(MutableDataSet markdownOptions) {
+		return HtmlRenderer.builder(markdownOptions).build();
 	}
 }

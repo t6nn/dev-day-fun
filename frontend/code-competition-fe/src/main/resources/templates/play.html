@@ -15,11 +15,9 @@
 <div class="container">
 
     <div class="starter-template">
-        <h1>Play</h1>
         <span th:inline="text">Hi, [[${gs.player.name}]]. You'll be coding in no time. Please wait while we're setting up the workspace. Meanwhile, have a look at the game description:</span>
 
-        <div id="description">
-
+        <div id="description" th:remove="tag" th:utext="${gameDescription}">
         </div>
 
         <div id="workspaceLink" style="display:none">

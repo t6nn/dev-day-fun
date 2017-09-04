@@ -13,7 +13,7 @@ do
     PROJECTDIR=$1/${dir}
     echo
     echo "Will compile: $dir"
-    cat $PROJECTDIR/player.json
+    cat $PROJECTDIR/game-session.json
     echo
-    ant -f build.xml -Dprojectdir=$PROJECTDIR/che-workspace
+    ant -f build.xml -Dprojectdir=$PROJECTDIR
 done

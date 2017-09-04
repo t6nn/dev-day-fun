@@ -4,14 +4,15 @@
     </description>
 
     <property name="projectdir" value="/dev/null"/>
-    <property name="builddir" location="${projectdir}/che-workspace/out"/>
-    <property name="testdir" location="${projectdir}/che-workspace/tests"/>
+    <property name="srcdir" location="${projectdir}/che-workspace"/>
+    <property name="builddir" location="${srcdir}/out"/>
+    <property name="testdir" location="${srcdir}/tests"/>
     <property name="verifydir" location="${projectdir}/verification"/>
     <property name="batsdir" location="${basedir}/bats"/>
 
     <target name="compile" description="compile the source">
         <mkdir dir="${builddir}"/>
-        <javac srcdir="${projectdir}" destdir="${builddir}" includeantruntime="false">
+        <javac srcdir="${srcdir}" destdir="${builddir}" includeantruntime="false">
             <include name="Solution.java"/>
         </javac>
     </target>

@@ -1,6 +1,7 @@
 che-data
 
 server/jenkins_home/*
+/out
 !server/jenkins_home/jobs/sessions/config.xml
 
 .idea

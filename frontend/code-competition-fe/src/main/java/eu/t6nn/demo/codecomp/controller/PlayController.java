@@ -1,7 +1,10 @@
 package eu.t6nn.demo.codecomp.controller;
 
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
 import eu.t6nn.demo.codecomp.model.DirectedSession;
 import eu.t6nn.demo.codecomp.model.GameSession;
+import eu.t6nn.demo.codecomp.service.GameList;
 import eu.t6nn.demo.codecomp.service.GameSessions;
 import eu.t6nn.demo.codecomp.service.SessionDirector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class PlayController {
     @Autowired
     private SessionDirector director;
 
+    @Autowired
+    private GameList gameList;
+
     @RequestMapping("/play/{sessionId}")
     public String play(@PathVariable String sessionId, Model model) throws ExecutionException, InterruptedException {
         GameSession session = sessions.byId(sessionId);
@@ -45,6 +51,8 @@ public class PlayController {
             model.addAttribute("apiUrl", "");
         }
 
+        model.addAttribute("gameDescription", gameList.loadGameDescriptionHtml(session.getGameId()));
+
         return "play";
     }
 
@@ -55,5 +63,4 @@ public class PlayController {
         director.stop(session);
         return "finish";
     }
-
 }
