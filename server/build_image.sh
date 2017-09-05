@@ -1,2 +1,2 @@
 #!/bin/bash
-docker image build -t devday/jenkins
+docker image build -t devday/jenkins .

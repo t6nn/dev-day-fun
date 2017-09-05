@@ -60,7 +60,7 @@
         $.ajax({
             url: apiUrl + "/workspace/namespace/che",
             success: function (result) {
-                if(result && result[0] && "RUNNING" == result[0].status) {
+                if(result && result[0] && "RUNNING" === result[0].status) {
                     $("#workspaceLink").show();
                     $("#spinner").hide();
                 } else {
