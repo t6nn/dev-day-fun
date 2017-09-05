@@ -18,19 +18,27 @@
     </target>
 
     <target name="test" description="run tests on the compiled source">
-        <exec dir="${testdir}" executable="${batsdir}/bats">
+        <exec failonerror="true" dir="${testdir}" executable="${batsdir}/bats">
             <arg value="tests.bats"/>
         </exec>
     </target>
 
     <target name="verify" description="run verification on the compiled source">
-        <exec dir="${verifydir}" executable="${batsdir}/bats">
+        <mkdir dir="${verifydir}/src"/>
+        <mkdir dir="${verifydir}/out"/>
+        <copy file="${srcdir}/Solution.java" todir="${verifydir}/src"/>
+        <javac srcdir="${verifydir}/src" destdir="${verifydir}/out" includeantruntime="false">
+            <include name="Solution.java"/>
+        </javac>
+        <exec failonerror="true" dir="${verifydir}" executable="${batsdir}/bats">
             <arg value="tests.bats"/>
         </exec>
     </target>
 
-    <target name="build" depends="compile,test,verify">
-
+    <target name="score" description="score the solution">
+        <exec dir="${verifydir}" executable="${verifydir}/score.sh"/>
     </target>
+
+    <target name="build" depends="compile,test,verify,score"/>
 
 </project>

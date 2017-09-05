@@ -3,14 +3,16 @@ package eu.t6nn.demo.codecomp.service;
 import com.google.gson.Gson;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Player;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class GameSessions {
@@ -56,6 +58,22 @@ public class GameSessions {
             }
         }
         throw new IllegalStateException("Session not found.");
+    }
+
+    public List<GameSession> findAll() {
+        File[] sessionDirCandidates = sessionDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+        if(sessionDirCandidates == null) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(sessionDirCandidates)
+                .filter(this::isSessionDirectory)
+                .map(f -> byId(f.getName()))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isSessionDirectory(File dir) {
+        return dir.isDirectory() && new File(dir, GAMESESSION_FILENAME).isFile();
     }
 
     private void createSessionDirectory(File sessionDir) {

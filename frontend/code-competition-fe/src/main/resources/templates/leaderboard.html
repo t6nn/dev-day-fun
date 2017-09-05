@@ -13,9 +13,23 @@
 <body>
 
 <div class="container">
-
-    <div class="starter-template">
-        <h1>Thanks for playing!</h1>
+    <h1>Current leaderboard</h1>
+    <div th:each="gameWithResults : ${gameResults}">
+        <h2 th:text="${gameWithResults.key.name}"/>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="gameResult : ${gameWithResults.value}">
+                    <td th:text="${gameResult.player.name}"></td>
+                    <td th:text="${gameResult.score}"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 </div>
@@ -24,11 +38,6 @@
 <script type="text/javascript"
         src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<script>
-    setTimeout(function(){
-        window.location = "/register";
-    }, 5000);
-</script>
 
 </body>
 </html>
