@@ -1,10 +1,12 @@
 package eu.t6nn.demo.codecomp.model;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class PlayerRegistration {
 
     @NotNull
+    @Valid
     private Player player = new Player();
 
     @NotNull

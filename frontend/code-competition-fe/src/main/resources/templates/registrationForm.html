@@ -23,8 +23,9 @@
                     <div class="form-group">
                         <label class="control-label" for="name">Name:</label>
                         <input class="form-control" type="text" id="name" name="name" th:field="*{player.name}"/>
-                        <span class="alert alert-warning" th:if="${#fields.hasErrors('player.name')}"
-                              th:errors="*{player.name}"/>
+                        <div class="alert alert-warning alert-dismissible" th:if="${#fields.hasErrors('player.name')}"
+                              th:errors="*{player.name}">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="email">E-mail:</label>
