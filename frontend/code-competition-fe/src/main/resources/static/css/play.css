@@ -1,0 +1,11 @@
+body {
+    padding-top: 25px;
+}
+
+.left { float: left; }
+
+.right { float: right; }
+
+.panel {
+    max-width: 1024px;
+}

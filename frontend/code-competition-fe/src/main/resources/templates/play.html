@@ -4,45 +4,51 @@
     <title>Play!</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <link rel="stylesheet" type="text/css"
-          href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
-
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/play.css}"/>
 
 </head>
 <body>
 
 <div class="container">
 
-    <div class="starter-template">
-        <span th:inline="text">Hi, [[${gs.player.name}]]. You'll be coding in no time. Please wait while we're setting up the workspace. Meanwhile, have a look at the game description:</span>
-
-        <div id="description" th:remove="tag" th:utext="${gameDescription}">
+    <div class="panel">
+        <div class="well">
+            <span th:inline="text">Hi, <strong>[[${gs.player.name}]]</strong>.
+                You'll be coding in no time. Please wait while we're setting up the workspace. Meanwhile, have a look at the game description below.</span>
         </div>
 
-        <div id="workspaceLink" style="display:none">
-            <p>
-                <a th:href="@{${workspaceUrl}}" target="_blank">Click here to open the workspace.</a>
-            </p>
-            <p>
-                <a th:href="@{/finish/{id}(id=${gs.id})}">Finish.</a>
-            </p>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Rules of the game</h3>
+            </div>
+            <div id="description" class="panel-body" th:utext="${gameDescription}">
+            </div>
         </div>
 
-        <div id="spinner" class="sk-fading-circle">
-            <div class="sk-circle1 sk-circle"></div>
-            <div class="sk-circle2 sk-circle"></div>
-            <div class="sk-circle3 sk-circle"></div>
-            <div class="sk-circle4 sk-circle"></div>
-            <div class="sk-circle5 sk-circle"></div>
-            <div class="sk-circle6 sk-circle"></div>
-            <div class="sk-circle7 sk-circle"></div>
-            <div class="sk-circle8 sk-circle"></div>
-            <div class="sk-circle9 sk-circle"></div>
-            <div class="sk-circle10 sk-circle"></div>
-            <div class="sk-circle11 sk-circle"></div>
-            <div class="sk-circle12 sk-circle"></div>
+
+        <div id="workspaceLink" style="display:none" class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Your workspace is now ready!</h3>
+            </div>
+            <div class="panel-body">
+                <a class="btn btn-success" th:data-href="@{${workspaceUrl}}" target="_blank">Open workspace</a>
+                <a class="btn btn-info right" th:href="@{/finish/{id}(id=${gs.id})}">Submit solution</a>
+            </div>
         </div>
+
+        <div id="spinner" class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Your workspace is being prepared. Please wait.</h3>
+            </div>
+            <div class="panel-body">
+                <div class="progress progress-striped active">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
@@ -61,13 +67,16 @@
             url: apiUrl + "/workspace/namespace/che",
             success: function (result) {
                 if(result && result[0] && "RUNNING" === result[0].status) {
-                    $("#workspaceLink").show();
+                    $("#spinner div.progress-bar").css("width", "100%");
                     $("#spinner").hide();
+                    $("#workspaceLink").show();
                 } else {
+                    $("#spinner div.progress-bar").css("width", "66%");
                     setTimeout(validateWorkspace, 1000);
                 }
             },
             error: function () {
+                $("#spinner div.progress-bar").css("width", "33%");
                 setTimeout(validateWorkspace, 1000);
             }
         });
