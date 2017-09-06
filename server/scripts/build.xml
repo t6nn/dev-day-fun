@@ -1,12 +1,13 @@
 <project name="Build All" default="build" basedir=".">
     <description>
-        simple example build file
+        Builds and verifies a solution.
     </description>
 
     <property name="projectdir" value="/dev/null"/>
-    <property name="srcdir" location="${projectdir}/che-workspace"/>
-    <property name="builddir" location="${srcdir}/out"/>
-    <property name="testdir" location="${srcdir}/tests"/>
+    <property name="wsdir" location="${projectdir}/che-workspace"/>
+    <property name="srcdir" location="${wsdir}/src"/>
+    <property name="builddir" location="${wsdir}/out"/>
+    <property name="testdir" location="${wsdir}/tests"/>
     <property name="verifydir" location="${projectdir}/verification"/>
     <property name="batsdir" location="${basedir}/bats"/>
 
