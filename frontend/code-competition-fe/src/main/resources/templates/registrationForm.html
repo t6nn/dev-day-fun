@@ -13,13 +13,13 @@
 
 <div class="container">
     <div class="row">
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Register to Play</h3>
+            </div>
             <div class="panel-body">
                 <form action="#" th:action="@{/register}" th:object="${playerRegistration}" method="post"
                       class="form-horizontal">
-                    <div class="form-group">
-                        <h2>Register to Play</h2>
-                    </div>
                     <div class="form-group">
                         <label class="control-label" for="name">Name:</label>
                         <input class="form-control" type="text" id="name" name="name" th:field="*{player.name}"/>
