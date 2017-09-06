@@ -6,4 +6,10 @@
 1. Set the admin user/pass for Jenkins (see [deploy_stack.sh](server/deploy_stack.sh) for an example).
 2. Deploy the Jenkins stack (`server/deploy_stack.sh`)
 3. Once Jenkins starts, install Ant there (not done automatically at the moment). Manage Jenkins -> Tools -> Ant installation. Name it "ant-main".
-4. Start the frontend (CodeCompetitionFeApplication).
+4. Start the frontend (CodeCompetitionFeApplication). VM arguments:
+```
+-Dsession.directory=<session dir>
+-Dlang.setup.directory=<lang subdir of the project>
+-Dgame.templates.dir=<games subdir of the project>
+-Ddocker.socket=//var/run/docker.sock
+```
