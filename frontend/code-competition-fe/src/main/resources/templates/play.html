@@ -33,7 +33,7 @@
                 <h3 class="panel-title">Your workspace is now ready!</h3>
             </div>
             <div class="panel-body">
-                <a class="btn btn-success" th:data-href="@{${workspaceUrl}}" target="_blank">Open workspace</a>
+                <a class="btn btn-success" th:href="@{${workspaceUrl}}" target="_blank">Open workspace</a>
                 <a class="btn btn-info right" th:href="@{/finish/{id}(id=${gs.id})}">Submit solution</a>
             </div>
         </div>
