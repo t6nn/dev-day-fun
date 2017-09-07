@@ -6,36 +6,50 @@
 
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/leaderboard.css}"/>
 
 </head>
 <body>
 
 <div class="container">
-    <h1>Current leaderboard</h1>
-    <div th:each="gameWithResults : ${gameResults}">
-        <h2 th:text="${gameWithResults.key.name}"/>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="gameResult : ${gameWithResults.value}">
-                    <td th:text="${gameResult.player.name}"></td>
-                    <td th:text="${gameResult.score}"></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="jumbotron">
+        <h1>Current leaderboard</h1>
     </div>
 
+    <div class="panel panel-info" th:each="gameWithResults : ${gameResults}">
+        <div class="panel-heading">
+            <h3 class="panel-title" th:text="${gameWithResults.key.name}"/>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="gameResult : ${gameWithResults.value}">
+                        <td th:text="${gameResult.player.name}"></td>
+                        <td th:text="${gameResult.score}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <!-- /.container -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript"
         src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+<script>
+    setInterval(function() {
+        if(window.location.hash === "#refresh") {
+            window.location.reload();
+        }
+    }, 10000);
+</script>
 
 </body>
 </html>
