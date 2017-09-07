@@ -2,12 +2,16 @@ package eu.t6nn.demo.codecomp.service;
 
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.exceptions.ContainerNotFoundException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
 import eu.t6nn.demo.codecomp.model.DirectedSession;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Language;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,10 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +30,10 @@ import java.util.function.Consumer;
 @Component
 public class SessionDirector {
 
-    public static final String CHE_SESSION_FILENAME = "che-session.json";
+    private static final String CHE_SESSION_FILENAME = "che-session.json";
+
+    private static final Logger LOG = LoggerFactory.getLogger(SessionDirector.class);
+
     @Autowired
     private GameSessions sessions;
 
@@ -164,6 +168,16 @@ public class SessionDirector {
                 final String id = creation.id();
 
                 docker.startContainer(id);
+
+                while(true) {
+                    try (ServerSocket s = new ServerSocket(session.cheBinding)){
+                        break;
+                    } catch (IOException e) {
+                        Thread.sleep(1000);
+                    }
+                }
+                portsInUse.remove(session.cheBinding);
+                LOG.info("Container released from port: {}", session.cheBinding);
             } catch (DockerException e) {
                 throw new IllegalStateException("Unable to stop docker.", e);
             } catch (InterruptedException e) {
