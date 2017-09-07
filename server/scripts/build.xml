@@ -37,6 +37,7 @@
     </target>
 
     <target name="score" description="score the solution">
+        <chmod file="${verifydir}/score.sh" perm="ugo+x"/>
         <exec dir="${verifydir}" executable="${verifydir}/score.sh"/>
     </target>
 
