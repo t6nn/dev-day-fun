@@ -6,12 +6,15 @@ import eu.t6nn.demo.codecomp.service.GameList;
 import eu.t6nn.demo.codecomp.service.GameSessions;
 import eu.t6nn.demo.codecomp.service.SessionDirector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +22,6 @@ import java.util.concurrent.TimeoutException;
 
 @Controller
 public class PlayController {
-
-    private static final long TIME_TO_PLAY = TimeUnit.MINUTES.toMillis(1);
 
     @Autowired
     private GameSessions sessions;
@@ -31,11 +32,17 @@ public class PlayController {
     @Autowired
     private GameList gameList;
 
+    @Value("${che.cookie}")
+    private String sessionCookieName;
+
+    @Value("${che.session.max-age-sec}")
+    private int sessionMaxAge;
+
     @RequestMapping("/play/{sessionId}")
-    public String play(@PathVariable String sessionId, Model model) throws ExecutionException, InterruptedException {
+    public String play(@PathVariable String sessionId, Model model, HttpServletResponse response) throws ExecutionException, InterruptedException {
         GameSession session = sessions.byId(sessionId);
         model.addAttribute("gs", session);
-        model.addAttribute("timeToPlay", TIME_TO_PLAY);
+        model.addAttribute("timeToPlay", TimeUnit.SECONDS.toMillis(sessionMaxAge));
 
         final CompletableFuture<DirectedSession> runningSession = new CompletableFuture<>();
         director.direct(session, sess -> {
@@ -53,22 +60,41 @@ public class PlayController {
         }
 
         model.addAttribute("gameDescriptions", gameList.loadGameDescriptions(session.getGameId()));
+        setSessionCookie(sessionId, response);
 
         return "play";
+    }
+
+    private void setSessionCookie(String sessionId, HttpServletResponse response) {
+        Cookie cookie = new Cookie(sessionCookieName, sessionId);
+        cookie.setMaxAge(sessionMaxAge);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    private void deleteSessionCookie(String sessionId, HttpServletResponse response) {
+        Cookie cookie = new Cookie(sessionCookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
     @ResponseBody
     @RequestMapping(value = "/start/{sessionId}")
     public long start(@PathVariable String sessionId) {
-        sessions.scheduleFinish(sessionId, () -> finish(sessionId), TIME_TO_PLAY + TimeUnit.SECONDS.toMillis(5));
+        sessions.scheduleFinish(sessionId, () -> stopSession(sessionId), TimeUnit.SECONDS.toMillis(sessionMaxAge) + TimeUnit.SECONDS.toMillis(5));
         return sessions.startSessionTimer(sessionId);
     }
 
     @RequestMapping("/finish/{sessionId}")
-    public String finish(@PathVariable String sessionId) {
-        GameSession session = sessions.byId(sessionId);
-
-        director.stop(session);
+    public String finish(@PathVariable String sessionId, HttpServletResponse response) {
+        stopSession(sessionId);
+        deleteSessionCookie(sessionId, response);
         return "finish";
+    }
+
+    private void stopSession(String sessionId) {
+        GameSession session = sessions.byId(sessionId);
+        director.stop(session);
     }
 }

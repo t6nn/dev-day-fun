@@ -1,0 +1,26 @@
+che:
+  version: "5.16.0"
+  port:
+    range:
+      start: 55000
+      end: 55010
+  cookie: "che-sess-id"
+  session:
+    max-age-sec: 900
+
+server:
+  port: 8080
+
+lang:
+  setup:
+    directory: "./lang"
+
+zuul:
+  routes:
+    sessions:
+      path: /**
+  ignoredPatterns: /,/play*,/register*,/finish*,/leaderboard*,/css*,/webjars*,/start*
+
+ribbon:
+  eureka:
+    enabled: false

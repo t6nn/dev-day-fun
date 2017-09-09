@@ -2,14 +2,11 @@ package eu.t6nn.demo.codecomp.service;
 
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.ContainerNotFoundException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.*;
 import eu.t6nn.demo.codecomp.model.DirectedSession;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.model.Language;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -46,9 +44,6 @@ public class SessionDirector {
     @Autowired
     private GameTemplates templates;
 
-//    @Value("${lang.setup.directory}")
-//    private File languageSetups;
-
     @Value("eclipse/che:${che.version}")
     private String cheImage;
 
@@ -61,6 +56,9 @@ public class SessionDirector {
     @Value("${docker.socket:/var/run/docker.sock}")
     private String dockerSocket;
 
+    @Value("localhost:${server.port}")
+    private String cheHost;
+
     private Set<Integer> portsInUse = new ConcurrentSkipListSet<>();
 
     @PostConstruct
@@ -71,7 +69,7 @@ public class SessionDirector {
     public void direct(GameSession session, final Consumer<DirectedSession> sessionCallback) {
         final File sessionDir = sessions.sessionDirectoryFor(session.getId());
 
-        if(isSessionRunning(sessionDir)) {
+        if(isSessionCreated(sessionDir)) {
             DockerSession runningSession = loadSession(sessionDir);
             sessionCallback.accept(runningSession);
             return;
@@ -99,7 +97,7 @@ public class SessionDirector {
                     System.out.println(container);
                 }
 
-                DockerSession dockerSession = new DockerSession(id, chePort);
+                DockerSession dockerSession = new DockerSession(chePort, session.getId());
                 storeSession(sessionDir, dockerSession);
                 sessionCallback.accept(dockerSession);
             } catch (InterruptedException e) {
@@ -108,6 +106,14 @@ public class SessionDirector {
                 throw new IllegalStateException("Unable to set up docker.", e);
             }
         });
+    }
+
+    public DirectedSession findRunningSession(String sessionId) {
+        File sessionDir = sessions.sessionDirectoryFor(sessionId);
+        if(sessionDir.exists()) {
+            return loadSession(sessionDir);
+        }
+        throw new IllegalArgumentException("Invalid session id: " + sessionId);
     }
 
     private ContainerConfig createContainerConfig(File sessionDir, int chePort, String ... cmd) {
@@ -144,7 +150,7 @@ public class SessionDirector {
         }
     }
 
-    private boolean isSessionRunning(File sessionDir) {
+    private boolean isSessionCreated(File sessionDir) {
         return new File(sessionDir, CHE_SESSION_FILENAME).isFile();
     }
 
@@ -163,21 +169,21 @@ public class SessionDirector {
 
         executorService.submit(() -> {
             try {
-                ContainerConfig config = createContainerConfig(sessionDir, session.cheBinding, "dir", "down");
+                ContainerConfig config = createContainerConfig(sessionDir, session.chePort, "dir", "down");
                 final ContainerCreation creation = docker.createContainer(config);
                 final String id = creation.id();
 
                 docker.startContainer(id);
 
                 while(true) {
-                    try (ServerSocket s = new ServerSocket(session.cheBinding)){
+                    try (ServerSocket s = new ServerSocket(session.chePort)){
                         break;
                     } catch (IOException e) {
                         Thread.sleep(1000);
                     }
                 }
-                portsInUse.remove(session.cheBinding);
-                LOG.info("Container released from port: {}", session.cheBinding);
+                portsInUse.remove(session.chePort);
+                LOG.info("Container released from port: {}", session.chePort);
             } catch (DockerException e) {
                 throw new IllegalStateException("Unable to stop docker.", e);
             } catch (InterruptedException e) {
@@ -206,19 +212,28 @@ public class SessionDirector {
 
 
     private static final class DockerSession implements DirectedSession {
-        private final String containerId;
-        private final int cheBinding;
+        private final int chePort;
+        private final String sessionId;
 
-        private DockerSession(String containerId, int cheBinding) {
-            this.containerId = containerId;
-            this.cheBinding = cheBinding;
+        private DockerSession(int chePort, String sessionId) {
+            this.chePort = chePort;
+            this.sessionId = sessionId;
+        }
+
+        @Override
+        public URL backendUrl() {
+            try {
+                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + chePort);
+            } catch (UnknownHostException | MalformedURLException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         @Override
         public URL workspaceUrl() {
             try {
-                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding + "/dashboard/#/ide/che/solution");
-            } catch (UnknownHostException | MalformedURLException e) {
+                return new URL("http://localhost:8080/dashboard/#/ide/che/solution");
+            } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
         }
@@ -226,8 +241,8 @@ public class SessionDirector {
         @Override
         public URL apiUrl() {
             try {
-                return new URL("http://" + InetAddress.getLocalHost().getHostAddress()+ ":" + cheBinding + "/api");
-            } catch (UnknownHostException | MalformedURLException e) {
+                return new URL("http://localhost:8080/api");
+            } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
         }
