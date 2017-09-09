@@ -30,6 +30,11 @@ public class RegisterController {
     @Autowired
     private GameList gameList;
 
+    @GetMapping("/")
+    public String redirectToRegistration() {
+        return "redirect:/register";
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         List<GameListItem> allGames = gameList.allGames();
