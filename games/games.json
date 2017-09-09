@@ -1,7 +1,24 @@
 {
   "code-golf-1": {
     "enabled": true,
-    "name": "Reverse an integer",
-    "rules": "CODEGOLF"
+    "name": "Code Golf (3 holes)",
+    "rules": "CODEGOLF",
+    "tasks": [
+      {
+        "id": "task-1",
+        "name": "Reverse an integer",
+        "defaultScore": 200
+      },
+      {
+        "id": "task-2",
+        "name": "Something else",
+        "defaultScore": 200
+      },
+      {
+        "id": "task-3",
+        "name": "Another one",
+        "defaultScore": 200
+      }
+    ]
   }
 }

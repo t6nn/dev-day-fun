@@ -51,7 +51,7 @@ public class PlayController {
             model.addAttribute("apiUrl", "");
         }
 
-        model.addAttribute("gameDescription", gameList.loadGameDescriptionHtml(session.getGameId()));
+        model.addAttribute("gameDescriptions", gameList.loadGameDescriptions(session.getGameId()));
 
         return "play";
     }

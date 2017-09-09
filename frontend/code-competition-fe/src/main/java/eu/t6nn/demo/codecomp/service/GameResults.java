@@ -1,9 +1,6 @@
 package eu.t6nn.demo.codecomp.service;
 
-import eu.t6nn.demo.codecomp.model.GameDef;
-import eu.t6nn.demo.codecomp.model.GameListItem;
-import eu.t6nn.demo.codecomp.model.GameSession;
-import eu.t6nn.demo.codecomp.model.GameResult;
+import eu.t6nn.demo.codecomp.model.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,19 +45,34 @@ public class GameResults {
     }
 
     private boolean hasScore(GameSession session) {
-        return resultFile(session).isFile();
+        GameDef def = games.byId(session.getGameId());
+        for(TaskDef task : def.getTasks()) {
+            if(resultFile(session, task).isFile()) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private File resultFile(GameSession session) {
-        return new File(gameSessions.sessionDirectoryFor(session.getId()), RESULT_FILENAME);
+    private File resultFile(GameSession session, TaskDef task) {
+        return new File(gameSessions.sessionDirectoryFor(session.getId()), "verification/" + task.getId() + "/" + RESULT_FILENAME);
     }
 
     private long getScore(GameSession session) {
-        try {
-            return Long.valueOf(FileUtils.readFileToString(resultFile(session), "UTF-8").trim());
-        } catch (IOException e) {
-            return Long.MAX_VALUE;
+        GameDef def = games.byId(session.getGameId());
+        long score = 0;
+        for(TaskDef task : def.getTasks()) {
+            try {
+                if(resultFile(session, task).isFile()) {
+                    score += Long.valueOf(FileUtils.readFileToString(resultFile(session, task), "UTF-8").trim());
+                    continue;
+                }
+            } catch (IOException e) {
+                // ignore, will continue with default score
+            }
+            score += task.getDefaultScore();
         }
+        return score;
     }
 
 }

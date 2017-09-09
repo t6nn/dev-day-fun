@@ -1,4 +1,4 @@
-<project name="Build All" default="build" basedir=".">
+<project name="Build All" basedir=".">
     <description>
         Builds and verifies a solution.
     </description>
@@ -11,36 +11,30 @@
     <property name="verifydir" location="${projectdir}/verification"/>
     <property name="batsdir" location="${basedir}/bats"/>
 
-    <target name="compile" description="compile the source">
+    <property name="taskid" value=""/>
+
+    <target name="compile-test" description="compile and test the source">
         <mkdir dir="${builddir}"/>
-        <javac srcdir="${srcdir}" destdir="${builddir}" includeantruntime="false">
-            <include name="Solution.java"/>
-        </javac>
+        <exec dir="${wsdir}" executable="${wsdir}/build-all.sh"/>
     </target>
 
-    <target name="test" description="run tests on the compiled source">
-        <exec failonerror="true" dir="${testdir}" executable="${batsdir}/bats">
-            <arg value="tests.bats"/>
-        </exec>
-    </target>
-
-    <target name="verify" description="run verification on the compiled source">
+    <target name="setup-verify" description="setup verification of tasks">
         <mkdir dir="${verifydir}/src"/>
         <mkdir dir="${verifydir}/out"/>
-        <copy file="${srcdir}/Solution.java" todir="${verifydir}/src"/>
+        <copy todir="${verifydir}/src">
+            <fileset dir="${srcdir}" includes="*.java"/>
+        </copy>
         <javac srcdir="${verifydir}/src" destdir="${verifydir}/out" includeantruntime="false">
-            <include name="Solution.java"/>
+            <include name="*.java"/>
         </javac>
-        <exec failonerror="true" dir="${verifydir}" executable="${batsdir}/bats">
+    </target>
+
+    <target name="verify-score" description="score the solution">
+        <exec failonerror="true" dir="${verifydir}/${taskid}" executable="${batsdir}/bats">
             <arg value="tests.bats"/>
         </exec>
+        <chmod file="${verifydir}/${taskid}/score.sh" perm="ugo+x"/>
+        <exec dir="${verifydir}/${taskid}" executable="${verifydir}/${taskid}/score.sh"/>
     </target>
-
-    <target name="score" description="score the solution">
-        <chmod file="${verifydir}/score.sh" perm="ugo+x"/>
-        <exec dir="${verifydir}" executable="${verifydir}/score.sh"/>
-    </target>
-
-    <target name="build" depends="compile,test,verify,score"/>
 
 </project>

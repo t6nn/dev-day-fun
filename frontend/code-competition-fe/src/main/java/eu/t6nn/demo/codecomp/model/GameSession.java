@@ -47,4 +47,8 @@ public class GameSession {
     public void setGameId(String gameId) {
         this.gameId = gameId;
     }
+
+    public Language getLang() {
+        return player.getLang();
+    }
 }

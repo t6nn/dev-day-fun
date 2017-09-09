@@ -1,0 +1,7 @@
+workspace.commands[0].type="build"
+workspace.commands[0].name="Compile"
+workspace.commands[0].commandLine="cd ${current.project.path} && ./build-all.sh"
+workspace.projects[0].type="javac"
+workspace.postload.actions[0].script="chmod ugo+x /projects/che-workspace/bats/* /projects/che-workspace/build-all.sh"
+workspace.name="solution"
+workspace.ram=2048

@@ -7,6 +7,7 @@ import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import eu.t6nn.demo.codecomp.model.GameDef;
 import eu.t6nn.demo.codecomp.model.GameListItem;
+import eu.t6nn.demo.codecomp.model.TaskDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,17 +62,26 @@ public class GameList {
         return def;
     }
 
-    public String loadGameDescriptionHtml(String gameId) {
-        File gameDescription = new File(gameDir(gameTemplates, gameId), DESCRIPTION_FILENAME);
-        if(gameDescription.isFile()) {
-            try(FileReader rdr = new FileReader(gameDescription)) {
-                Node document = markdownParser.parseReader(rdr);
-                return markdownRenderer.render(document);
-            } catch (IOException e) {
-                LOG.warn("Unable to read game description for " + gameId, e);
+    public Map<TaskDef, String> loadGameDescriptions(String gameId) {
+        Map<TaskDef, String> descriptions = new LinkedHashMap<>();
+        GameDef game = byId(gameId);
+        for(TaskDef task : game.getTasks()) {
+            File gameDescription = new File(taskDir(gameDir(gameTemplates, gameId), task), DESCRIPTION_FILENAME);
+            if(gameDescription.isFile()) {
+                try(FileReader rdr = new FileReader(gameDescription)) {
+                    Node document = markdownParser.parseReader(rdr);
+                    descriptions.put(task, markdownRenderer.render(document));
+                } catch (IOException e) {
+                    LOG.warn("Unable to read game description for " + gameId, e);
+                }
             }
         }
-        return "";
+
+        return descriptions;
+    }
+
+    private File taskDir(File gameDir, TaskDef task) {
+        return new File(gameDir, task.getId());
     }
 
     private File gameDir(File gameTemplates, String name) {

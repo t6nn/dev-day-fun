@@ -46,8 +46,8 @@ public class SessionDirector {
     @Autowired
     private GameTemplates templates;
 
-    @Value("${lang.setup.directory}")
-    private File languageSetups;
+//    @Value("${lang.setup.directory}")
+//    private File languageSetups;
 
     @Value("eclipse/che:${che.version}")
     private String cheImage;
@@ -78,8 +78,8 @@ public class SessionDirector {
         }
 
         try {
-            File workspaceDir = setupWorkspace(sessionDir, session.getPlayer().getLang());
-            templates.prepareSession(session.getGameId(), sessionDir, workspaceDir);
+            File workspaceDir = setupWorkspace(sessionDir, session.getLang());
+            templates.prepareSession(session.getGameId(), sessionDir, workspaceDir, session.getLang());
         } catch (IOException e) {
             throw new IllegalStateException("Unable to set up workspace.", e);
         }
@@ -187,18 +187,12 @@ public class SessionDirector {
     }
 
     private File setupWorkspace(File sessionDir, Language lang) throws IOException {
-        File languageDir = new File(languageSetups, lang.name().toLowerCase());
-        if (!languageDir.isDirectory()) {
-            throw new IllegalStateException("Directory " + languageDir + " does not exist");
-        }
-        File templateDir = new File(languageDir, "ws-template");
         File workspaceDir = cheWorkspaceDir(sessionDir);
 
         File cheData = cheDataDir(sessionDir);
         if (!cheData.isDirectory() && !cheData.mkdirs()) {
             throw new IllegalStateException("Unable to create Che working directory");
         }
-        FileUtils.copyDirectory(templateDir, workspaceDir);
         return workspaceDir;
     }
 
