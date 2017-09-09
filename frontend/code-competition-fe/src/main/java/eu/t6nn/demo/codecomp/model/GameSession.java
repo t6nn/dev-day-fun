@@ -10,6 +10,8 @@ public class GameSession {
 
     private String gameId;
 
+    private boolean started;
+
     public GameSession() {
         this(null, null);
     }
@@ -50,5 +52,13 @@ public class GameSession {
 
     public Language getLang() {
         return player.getLang();
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
     }
 }
