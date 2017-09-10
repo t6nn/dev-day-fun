@@ -1,8 +1,10 @@
 package eu.t6nn.demo.codecomp.controller;
 
 import eu.t6nn.demo.codecomp.model.DirectedSession;
+import eu.t6nn.demo.codecomp.model.GameResult;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.service.GameList;
+import eu.t6nn.demo.codecomp.service.GameResults;
 import eu.t6nn.demo.codecomp.service.GameSessions;
 import eu.t6nn.demo.codecomp.service.SessionDirector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class PlayController {
 
     @Autowired
     private GameList gameList;
+
+    @Autowired
+    private GameResults gameResults;
 
     @Value("${che.cookie}")
     private String sessionCookieName;
@@ -87,9 +92,10 @@ public class PlayController {
     }
 
     @RequestMapping("/finish/{sessionId}")
-    public String finish(@PathVariable String sessionId, HttpServletResponse response) {
+    public String finish(@PathVariable String sessionId, HttpServletResponse response, Model model) {
         stopSession(sessionId);
         deleteSessionCookie(sessionId, response);
+        model.addAttribute("gameResult", gameResults.forSession(sessionId));
         return "finish";
     }
 

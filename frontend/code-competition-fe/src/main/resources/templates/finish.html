@@ -12,12 +12,17 @@
 
 <div class="container">
 
-    <div>
+    <div class="jumbotron">
         <h1>Thanks for playing!</h1>
-        <p>
-            Keep an eye on the leaderboard for your results.
+        <p th:if="${gameResult}" th:inline="text">
+            Well done, [[${gameResult.player.name}]]! You scored <strong>[[${gameResult.score}]]</strong> points! <br/>Have a look at the <a th:href="@{/leaderboard}">leaderboard</a> to see how you match up with others.
+        </p>
+        <p th:unless="${gameResult}">
+            Unfortunately you didn't score any points. No worries, you can always retry later.
         </p>
     </div>
+
+    <span>Redirecting to the registration page in a few seconds...</span>
 
 </div>
 <!-- /.container -->
@@ -28,7 +33,7 @@
 <script>
     setTimeout(function(){
         window.location = "/register";
-    }, 5000);
+    }, 10000);
 </script>
 
 </body>

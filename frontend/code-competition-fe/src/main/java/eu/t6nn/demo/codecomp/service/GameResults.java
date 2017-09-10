@@ -44,6 +44,15 @@ public class GameResults {
                 .collect(Collectors.toList());
     }
 
+    public GameResult forSession(@NotNull String sessionId) {
+        GameSession session = gameSessions.byId(sessionId);
+        if(!hasScore(session)) {
+            return null;
+        } else {
+            return new GameResult(session, session.getPlayer(), getScore(session));
+        }
+    }
+
     private boolean hasScore(GameSession session) {
         GameDef def = games.byId(session.getGameId());
         for(TaskDef task : def.getTasks()) {
