@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 cp=../../out/task-2
-runcmd="java -cp $cp Task2"
+runcmd="java -cp $cp FindConnectedBlocks"
 
 @test "First test" {
   expected="$(cat test1.out)"
