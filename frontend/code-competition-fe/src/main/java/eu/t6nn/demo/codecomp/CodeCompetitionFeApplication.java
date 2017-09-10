@@ -1,7 +1,5 @@
 package eu.t6nn.demo.codecomp;
 
-import com.netflix.zuul.context.ContextLifecycleFilter;
-import com.netflix.zuul.http.ZuulServlet;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
@@ -11,17 +9,11 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

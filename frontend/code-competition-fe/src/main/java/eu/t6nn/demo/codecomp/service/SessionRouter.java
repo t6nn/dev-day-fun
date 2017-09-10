@@ -2,25 +2,13 @@ package eu.t6nn.demo.codecomp.service;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.filters.FilterRegistry;
-import com.netflix.zuul.util.HTTPRequestUtils;
 import eu.t6nn.demo.codecomp.model.DirectedSession;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
-import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
-import org.springframework.cloud.netflix.zuul.util.RequestUtils;
 import org.springframework.stereotype.Component;
-import sun.misc.Request;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
 
 @Component
 public class SessionRouter extends ZuulFilter {
