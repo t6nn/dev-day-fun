@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Something went wrong...</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <h1 th:inline="text">Error [[${status}]]</h1>
+            <p>
+                Something went wrong. We're sorry. Feel free to poke someone who's responsible for this nonsense.
+            </p>
+            <p><a class="btn btn-primary btn-lg" th:href="@{/register}">Start over</a></p>
+            <div th:inline="text" style="display:none;">
+                [[${exception}]]
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript"
+        src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+</html>
