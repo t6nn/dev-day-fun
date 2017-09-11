@@ -1,13 +1,13 @@
-# Code golf - task 3
+# Code golf - Missing number
 
 ## Input
-Task 3 input
+Array of positive integer numbers separated by spaces
 
 ## Task
-Task 3 description
+You are given an array of positive integers, each number repeats even number of times except for one. Find the missing number.
 
 ## Output
-Task 3 output
+The integer repeating odd number of times.
 
 ## Code Golf
 Solutions compete against each other, based on the number of bytes in your source file. The solution

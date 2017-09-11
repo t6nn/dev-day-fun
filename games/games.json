@@ -11,12 +11,12 @@
       },
       {
         "id": "task-2",
-        "name": "Find connected blocks",
+        "name": "Matrix sum",
         "defaultScore": 200
       },
       {
         "id": "task-3",
-        "name": "Another one",
+        "name": "Find missing number",
         "defaultScore": 200
       }
     ]
