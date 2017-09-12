@@ -17,9 +17,10 @@ public class FindMatrixSum {
   private static int[][] constructMatrix(String in) {
     String[] rows = in.split("\\$");
     int n = rows.length;
-    int[][] matrix = new int[n][rows[0].split(",").length];
+    int cols = rows[0].split(",").length;
+    int[][] matrix = new int[n][cols];
     for (int i = 0; i < n; i++) {
-      int[] row = new int[n];
+      int[] row = new int[cols];
       int j = 0;
       String[] elements = rows[i].split(",");
       for (String element : elements) {

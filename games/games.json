@@ -7,17 +7,17 @@
       {
         "id": "task-1",
         "name": "Reverse an integer",
-        "defaultScore": 200
+        "defaultScore": 1408
       },
       {
         "id": "task-2",
-        "name": "Matrix sum",
-        "defaultScore": 200
+        "name": "Add things up",
+        "defaultScore": 1578
       },
       {
         "id": "task-3",
-        "name": "Find missing number",
-        "defaultScore": 200
+        "name": "The odd one out",
+        "defaultScore": 658
       }
     ]
   }
