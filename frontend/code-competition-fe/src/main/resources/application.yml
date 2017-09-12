@@ -19,7 +19,7 @@ zuul:
   routes:
     sessions:
       path: /**
-  ignoredPatterns: /,/play*,/register*,/finish*,/leaderboard*,/css*,/webjars*,/start*
+  ignoredPatterns: /,/play*,/register*,/finish*,/leaderboard*,/css*,/webjars*,/start*,/imgs*
 
 ribbon:
   eureka:

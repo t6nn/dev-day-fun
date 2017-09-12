@@ -28,10 +28,18 @@
                     <a class="nav-link" th:href="@{${'#' + task.id}}" th:text="${task.name}" role="tab"
                        data-toggle="tab"/>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#workspace-tutor" data-toggle="tab" role="tab" style="color: red">Workspace Tutorial</a>
+                </li>
             </ul>
             <div class="tab-content" id="gameDescriptions">
                 <div th:each="game : ${gameDescriptions}" th:id="${game.key.id}" class="tab-pane" role="tabpanel"
                      th:utext="${game.value}"/>
+                <div th:class="tab-pane" id="workspace-tutor" role="tabpanel">
+                    <div class="imgwrapper">
+                        <img th:src="@{/imgs/che_tutorial.png}" class="img-responsive"/>
+                    </div>
+                </div>
             </div>
             <!--div id="description" class="panel-body" th:utext="${gameDescription}">
             </div-->
