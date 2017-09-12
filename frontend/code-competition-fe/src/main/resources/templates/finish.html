@@ -15,10 +15,10 @@
     <div class="jumbotron">
         <h1>Thanks for playing!</h1>
         <p th:if="${gameResult}" th:inline="text">
-            Well done, [[${gameResult.player.name}]]! You scored <strong>[[${gameResult.score}]]</strong> points! <br/>Have a look at the <a th:href="@{/leaderboard}">leaderboard</a> to see how you match up with others.
+            Well done, [[${gameResult.player.name}]]! You scored <strong>[[${gameResult.score}]]</strong> points the last time we checked! <br/>Have a look at the <a th:href="@{/leaderboard}">leaderboard</a> to see how you match up with others.
         </p>
         <p th:unless="${gameResult}">
-            Unfortunately you didn't score any points. No worries, you can always retry later.
+            Unfortunately we haven't calculated the score for you yet. No worries, you can always check out later on the <a th:href="@{/leaderboard}">leaderboard</a>.
         </p>
     </div>
 
