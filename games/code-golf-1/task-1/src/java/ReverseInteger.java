@@ -1,11 +1,21 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class ReverseInteger {
 
     public static void main(String[] args) {
         // Your solution goes here
         // Following is a (not so clever) example solution, feel free to remove any or all of the methods provided.
-        String[] reversedNumbers = processInputs(args);
+
+        Scanner s = new Scanner(System.in);
+        List<String> input = new ArrayList<>();
+        while(s.hasNext()) {
+            input.add(s.next());
+        }
+        String[] reversedNumbers = processInputs(input.toArray(new String[input.size()]));
         String result = String.join(" ", reversedNumbers);
-        System.out.println(result);
+        System.out.print(result);
     }
 
     private static String[] processInputs(String[] initialStrings) {
