@@ -1,7 +1,6 @@
 package eu.t6nn.demo.codecomp.controller;
 
 import eu.t6nn.demo.codecomp.model.DirectedSession;
-import eu.t6nn.demo.codecomp.model.GameResult;
 import eu.t6nn.demo.codecomp.model.GameSession;
 import eu.t6nn.demo.codecomp.service.GameList;
 import eu.t6nn.demo.codecomp.service.GameResults;
@@ -59,9 +58,11 @@ public class PlayController {
             DirectedSession sess = runningSession.get(5000, TimeUnit.SECONDS);
             model.addAttribute("workspaceUrl", sess.workspaceUrl());
             model.addAttribute("apiUrl", sess.apiUrl());
+            model.addAttribute("finished", sess.isFinished());
         } catch (TimeoutException e) {
             model.addAttribute("workspaceUrl", "");
             model.addAttribute("apiUrl", "");
+            model.addAttribute("finished", true);
         }
 
         model.addAttribute("gameDescriptions", gameList.loadGameDescriptions(session.getGameId()));

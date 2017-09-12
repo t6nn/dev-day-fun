@@ -13,7 +13,7 @@
 
 <div class="container">
 
-    <div class="panel">
+    <div>
         <div class="well">
             <span th:inline="text">Hi, <strong>[[${gs.player.name}]]</strong>.
                 You'll be coding in no time. Please wait while we're setting up the workspace. Meanwhile, have a look at the game description below.</span>
@@ -39,8 +39,17 @@
 
         <div class="alert alert-danger" role="alert" id="countdown" style="display: none;"></div>
 
+        <div th:if="${finished}" class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">Your session has ended</h3>
+            </div>
+            <div class="panel-body">
+                Your session has already ended.
+                Have a look at the <a th:href="@{/leaderboard}">leaderboard</a> to see how well you did.
+            </div>
+        </div>
 
-        <div id="workspaceLink" style="display:none" class="panel panel-success">
+        <div th:unless="${finished}" id="workspaceLink" style="display:none" class="panel panel-success">
             <div class="panel-heading">
                 <h3 class="panel-title">Your workspace is now ready!</h3>
             </div>
@@ -54,7 +63,7 @@
         </div>
 
 
-        <div id="spinner" class="panel panel-info">
+        <div th:unless="${finished}" id="spinner" class="panel panel-info">
             <div class="panel-heading">
                 <h3 class="panel-title">Your workspace is being prepared. Please wait.</h3>
             </div>
@@ -74,10 +83,12 @@
 <script type="text/javascript"
         src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
+<script>
     $('#taskTabs a:first').tab('show');
+</script>
 
+<script th:unless="${finished}" th:inline="javascript">
+    /*<![CDATA[*/
     var apiUrl = /*[[${apiUrl.toString()}]]*/ '';
     var gs = /*[[${gs}]]*/ '';
 

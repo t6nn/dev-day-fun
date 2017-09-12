@@ -6,7 +6,7 @@ body {
 
 .right { float: right; }
 
-.panel {
+.panel, .well {
     max-width: 1024px;
 }
 

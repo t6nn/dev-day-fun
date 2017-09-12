@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
@@ -113,7 +114,12 @@ public class SessionDirector {
     public DirectedSession findRunningSession(String sessionId) {
         File sessionDir = sessions.sessionDirectoryFor(sessionId);
         if(sessionDir.exists()) {
-            return loadSession(sessionDir);
+            DockerSession session = loadSession(sessionDir);
+            if(!session.isFinished()) {
+                return session;
+            } else {
+                return null;
+            }
         }
         throw new IllegalArgumentException("Invalid session id: " + sessionId);
     }
@@ -169,6 +175,13 @@ public class SessionDirector {
         final File sessionDir = sessions.sessionDirectoryFor(gameSession.getId());
         final DockerSession session = loadSession(sessionDir);
 
+        if(session.isFinished()) {
+            return;
+        }
+
+        session.finish();
+        storeSession(sessionDir, session);
+
         executorService.submit(() -> {
             try {
                 ContainerConfig config = createContainerConfig(sessionDir, session.chePort, "dir", "down");
@@ -216,10 +229,20 @@ public class SessionDirector {
     private static final class DockerSession implements DirectedSession {
         private final int chePort;
         private final String sessionId;
+        private Date finished;
 
         private DockerSession(int chePort, String sessionId) {
             this.chePort = chePort;
             this.sessionId = sessionId;
+        }
+
+        void finish() {
+            this.finished = new Date();
+        }
+
+        @Override
+        public boolean isFinished() {
+            return this.finished != null;
         }
 
         @Override
