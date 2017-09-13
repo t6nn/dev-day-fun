@@ -73,7 +73,7 @@ public class PlayController {
 
     private void setSessionCookie(String sessionId, HttpServletResponse response) {
         Cookie cookie = new Cookie(sessionCookieName, sessionId);
-        cookie.setMaxAge(sessionMaxAge);
+        cookie.setMaxAge(sessionMaxAge + 120);
         cookie.setPath("/");
         response.addCookie(cookie);
     }
