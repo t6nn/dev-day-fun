@@ -1,7 +1,7 @@
 # Code golf - Finding the largest row or column
 
 ## Input
-A string representing a matrix (a two dimensional array) of integers. Elements are separated by commas while rows of the matrix are separated by symbol '$'.
+Provided from standard input via `System.in`. A string representing a matrix (a two dimensional array) of integers. Elements are separated by commas while rows of the matrix are separated by symbol '$'.
 No value in the matrix exceeds 2^31-1. The number of elements in each row or column does not exceed 20.
 
 ## Task
@@ -20,7 +20,7 @@ In this example the largest row or column is the last column of the matrix, with
 The output should be therefore 1002 % 13092017 = 1002.
    
 ## Output
-Largest sum, modulo 13092017.
+Largest sum, modulo 13092017, sent to standard output via `System.out`. No other characters expected.
 
 Output (for the matrix above):
 
